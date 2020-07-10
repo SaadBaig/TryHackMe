@@ -2,7 +2,7 @@
 
 This was my first TryHackMe box. Lets see what I can discover!
 
-##Port Enumeration
+## Port Enumeration
 
 Started my hunt with a simple nmap scan:
 
@@ -29,7 +29,7 @@ Nmap done: 1 IP address (1 host up) scanned in 23.05 seconds
 
 Port 22 was open using OpenSSH 7.2p2 and port 80 was hosting Apache 2.4.18
 
-##Directory Enumeration
+## Directory Enumeration
 
 Utilized gobuster to enumerate directories on the IP:
 
@@ -80,7 +80,7 @@ I manually went through each directory in the browser, and /inc had a couple int
 
 Lets see what exploits SweetRice has:
 
-##Exploitation
+## Exploitation
 
 ```bash
 ➜  ~ searchsploit sweetrice
@@ -101,6 +101,6 @@ What caught my eye was ````SweetRice 1.5.1 - Arbitrary File Upload       | php/w
 
 Browsing through the dasboard I found in the ad section that you can upload ~~Ad~~ arbitruary code...lets upload a PHP reverse shell and get going!
 
-##Post Exploitation
+## Post Exploitation
 
 *Currently at this stage of the box, this will be updated in the coming days*
