@@ -76,7 +76,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 /attachment (Status: 301)
 ```
 
-I manually went through each directory in the browser, and /inc had a couple interesting files including a ```mysql_backup/``` folder. I grabbed the file inside and examined it. Found an interesting entry: ```"manager\\";s:6:\\"passwd\\";s:32:\\"42f749ade7f9e195bf475f37a44cafcb```. Looks like a hash. The only vulnerable "moderm" hashing algorithms I know of are SHA1 and MD5, the latter being significantly easier to reverse, hell, I created a program in my Python Pentesting Repo to do it. Lo and Behold: ```Password123```. But where do we put this password? A potential hint within that webpage was "If you are the webmaster, please to go Dashboard > General > Website setting". Doing a quick google search for "sweetrice dashboard" I found a google image showing a location in /content/as, one of the directories gobuster found!  Sure enough, there's a login page at /content/as. Using user ```manager``` and password ```Password123``` I was able to get into the the dashboard! Huzzah!
+I manually went through each directory in the browser, and /inc had a couple interesting files including a ```mysql_backup/``` folder. I grabbed the file inside and examined it. Found an interesting entry: ```"manager\\";s:6:\\"passwd\\";s:32:\\"42f749ade7f9e195bf475f37a44cafcb```. Looks like a hash. The only vulnerable "moderm" hashing algorithms I know of are SHA1 and MD5, the latter being significantly easier to reverse, hell, I created a program in my Python Pentesting Repo to do it. Lo and Behold: ```Password123```. But where do we put this password? A potential hint within that webpage was "If you are the webmaster, please to go Dashboard > General > Website setting". Doing a quick google search for "sweetrice dashboard" I found a google image showing a location in ```/content/as```, one of the directories gobuster found!  Sure enough, there's a login page at ```/content/as```. Using user ```manager``` and password ```Password123``` I was able to get into the the dashboard! Huzzah!
 
 Lets see what exploits SweetRice has:
 
@@ -97,7 +97,7 @@ SweetRice 1.5.1 - Cross-Site Request Forgery  | php/webapps/40700.html
 SweetRice < 0.6.4 - FCKeditor Arbitrary Fil   | php/webapps/14184.txt
 ```
 
-What caught my eye was ````SweetRice 1.5.1 - Arbitrary File Upload       | php/webapps/40716.py```. Reading through it, we can use a PHP reverse shell to gain access!
+What caught my eye was ```SweetRice 1.5.1 - Arbitrary File Upload       | php/webapps/40716.py```. Reading through it, we can use a PHP reverse shell to gain access!
 
 Browsing through the dasboard I found in the ad section that you can upload ~~Ad~~ arbitruary code...lets upload a PHP reverse shell and get going!
 
