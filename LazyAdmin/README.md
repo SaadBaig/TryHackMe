@@ -102,7 +102,8 @@ What caught my eye was ```SweetRice 1.5.1 - Arbitrary File Upload       | php/we
 
 Browsing through the dasboard I found in the ad section that you can upload ~~ad~~ arbitruary code...lets upload a PHP reverse shell and get going!
 
-![image](https://user-images.githubusercontent.com/38113471/87210031-564c0f00-c2d1-11ea-9a0e-b353bb997e65.png)
+![yayeet](https://user-images.githubusercontent.com/38113471/87210313-513b8f80-c2d2-11ea-8f4e-69d86f4dff6f.jpeg)
+
 
 I used pentestmonkey's PHP reverse shell I snagged from Github, pasted it into the section that takes in code, named it ```reverse_shell``` pointed it to my internal private IP and listened on the default 1234 port:
 
