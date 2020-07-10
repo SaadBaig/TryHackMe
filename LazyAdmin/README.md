@@ -7,6 +7,7 @@ This was my first TryHackMe box. Lets see what I can discover!
 Started my hunt with a simple nmap scan:
 
 ```bash
+➜  ~ export IP=10.10.151.48
 ➜  ~ sudo nmap -sC -sV -Pn -n $IP
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-07-10 12:06 MDT
 Nmap scan report for 10.10.151.48
