@@ -1,8 +1,8 @@
-## Blog
+# Blog
 
 Apparently Billy Joel made a blog. My friend Jeff Rowell wanted to do this box, so here we go :)
 
-# Enumeration
+## Enumeration
 
 nmap:
 
@@ -266,7 +266,7 @@ Well looks like we have one password, for bjoels sweet mom (if you browsed the b
 
 ## Exploitation
 
-Now that I had user access, all I needed to do was find an exploit. I sinply googled "wordpress 5.0 exploit" and used the very first link to find an exploit to use in metasploit:
+Now that I had user access, all I needed to do was find an exploit. I simply googled "wordpress 5.0 exploit" and used the very first link to find an exploit to use in metasploit:
 
 ```bash
 msf5 > search crop-image
