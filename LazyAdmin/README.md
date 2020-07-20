@@ -170,7 +170,7 @@ cat user.txt
 THM{REDACTED}
 ```
 
-## Post Exploitation/Elevating Priviledges
+## Post Exploitation/Privilege Escalation
 
 BOOM! After figuring out ```whoiam```, I ran ```sudo -l``` to see what commands I could run as ```sudo```
 
