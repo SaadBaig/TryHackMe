@@ -19,6 +19,7 @@ Initially I wasn't able to run the program because I didn't have permissions. Ru
 osboxes@osboxes.org: ~ Downloads$ chmod +x crackme1
 osboxes@osboxes.org: ~ Downloads$ ./crackme1
 flag{REDACTED}
+```
 
 ## Crackme2
 THe 2nd level involved us finding a "super secret password" which I had 0 clue how to obtain. Through some googling, I found a command ```strings``` which will find text strings embedded in executables. I decided to flex distro's and  boot up Centos 7 box:
