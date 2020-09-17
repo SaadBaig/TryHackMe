@@ -22,7 +22,7 @@ flag{REDACTED}
 ```
 
 ## Crackme2
-THe 2nd level involved us finding a "super secret password" which I had 0 clue how to obtain. Through some googling, I found a command ```strings``` which will find text strings embedded in executables. I decided to flex distro's and  boot up Centos 7 box:
+The 2nd level involved us finding a "super secret password" which I had 0 clue how to obtain. Through some googling, I found a command ```strings``` which will find text strings embedded in executables. I decided to flex distro's and  boot up Centos 7 box:
 
 ```bash
 strings crackme2
@@ -119,7 +119,7 @@ GCC: (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3
 .comment
 ```
 
-We have a couple clues here to process. Trying to input "ZjByX3kwdXJfNWVjMG5kX2xlNTVvbl91bmJhc2U2NF80bGxfN2gzXzdoMW5nNQ==" and "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" as passwords give me a ```Permission Denied```. Trying those passwords without the 2 symbols at the end didn't work either. 
+We have a couple clues here to process. Trying to input ```ZjByX3kwdXJfNWVjMG5kX2xlNTVvbl91bmJhc2U2NF80bGxfN2gzXzdoMW5nNQ==``` and ```ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/``` as passwords give me a ```Permission Denied```. Trying those passwords without the 2 symbols at the end didn't work either. 
 
 ### Dynamic Analysis
 
